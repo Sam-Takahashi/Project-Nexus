@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/User");
 const Post = require("../models/Post");
+const ProfilePage = require("../models/ProfilePage")
 
 // CREATE POST
 router.post("/", async (req, res) => {
