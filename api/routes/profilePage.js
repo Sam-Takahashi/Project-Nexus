@@ -3,40 +3,26 @@ const router = require("express").Router();
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Category = require("../models/Category");
+const http = require('http');
+const request = require('require')
 
 router.get("/", async (req, res) => {
     try {
-        const cats = await Category.find();
-        res.status(200).json(cats);
+        const posts = await Post.find({ user: req.user._id}).sort({date: -1});
+        res.status(200).json(posts);
     } catch (err) {
-        res.status(500).json(err);
+        console.error(err.message);
+        res.status(500).send('Server Error');
     }
 });    
 
-// GET ALL POSTS
-router.get("/", async (req, res) => {
-    const username = req.query.user;
-    const catName = req.query.cat;
+//GET ALL POST EXCEPT THE USER'S
 
-    try {
-        let posts;
-        
-        if (username) {
-            posts = await Post.find({ username });
-        } else if (catName) {
-            posts = await Post.find({
-                categories: {
-                    $in: [catName],
-                },
-            });
-        } else {
-            posts = await Post.find();
-        }
-
-        res.status(200).json(posts);
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
+ request.get('https://shrouded-basin-56205.herokuapp.com/api/posts', (res) => {
+    res.setEncoding('utf8');
+    res.on('error', console.log)
+    res.on('data', function (body) {
+        console.log(body)
+ })
+    })
 module.exports = router;
