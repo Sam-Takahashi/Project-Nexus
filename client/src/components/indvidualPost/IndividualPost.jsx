@@ -19,19 +19,31 @@ export default function IndividualPost() {
     useEffect(() => {
         setLoading(true);
         const getPost = async () => {
-            const res = await axios.get("https://shrouded-basin-56205.herokuapp.com/api/posts/" + path);
+            const res = await axios.get(process.env.REACT_APP_BASE_URL+"/api/posts/" + path);
+            setPost(res.data);
             setLoading(false);
-            setPost(res.data);
-            setPost(res.data);
             setTitle(res.data.title);
             setDesc(res.data.desc);
         };
         getPost();
     }, [path]);
 
+    const handleUpvote = async () => {
+        const newVote = {
+            post: post._id,
+            user: user._id,
+            type: true
+        };
+        try{
+            const res = await axios.post(process.env.REACT_APP_BASE_URL+`/api/posts/upvote`, newVote);
+        } catch (err){
+            // console.log(err);
+        }
+    }
+
     const handleDelete = async () => {
         try {
-        await axios.delete(`https://shrouded-basin-56205.herokuapp.com/api/posts/${post._id}`, {
+        await axios.delete(process.env.REACT_APP_BASE_URL+`/api/posts/${post._id}`, {
             data: { username: user.username },
         });
         window.location.replace("/");
@@ -40,8 +52,8 @@ export default function IndividualPost() {
 
     const handleUpdate = async () => {
         try {
-            await axios.put(`https://shrouded-basin-56205.herokuapp.com/api/posts/${post._id}`, {
-                username: user.username,
+            await axios.put(process.env.REACT_APP_BASE_URL+`/api/posts/${post._id}`, {
+                user: user._id,
                 title,
                 desc,
             });
@@ -82,7 +94,7 @@ export default function IndividualPost() {
                             ) : (
                                 <h1 className="indPostTitle">
                                     { title }
-                                    {post.username === user?.username && (
+                                    {post.user ? post.user._id === user._id && (
                                     <div className="indPostEdit">
                                         <i
                                             className="indPostIcon far fa-edit"
@@ -93,17 +105,17 @@ export default function IndividualPost() {
                                         onClick={handleDelete}
                                         ></i>
                                     </div>
-                                    )}
+                                    ):""}
                                 </h1>
                             )}
                             <div className="indPostInfo">
                                 <span>
                                     Author:
                                     <b className="indPostAuthor">
-                                        <Link className="link" to={`/?user=${post.username}`}>
-                                            { post.username }
+                                        <Link className="link" to={`/?user=${post.user?post.user._id:""}`}>
+                                            { post.user?post.user.fullname:"" }
                                         </Link>
-                                    </b>
+                                    </b> | <button onClick={handleUpvote}>Upvote</button> | {post.votes?post.votes.length +" Votes":""}
                                 </span>
                                 <span>{ new Date(post.createdAt).toDateString() }</span>
                             </div>
