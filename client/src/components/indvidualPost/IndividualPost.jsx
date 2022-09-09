@@ -80,7 +80,7 @@ export default function IndividualPost() {
                                 <img
                                     className="indPostImg"
                                     src={ post.photo }
-                                    alt=""
+                                    alt={ post.title }
                                 />
                             }
                             { updateMode ? (
